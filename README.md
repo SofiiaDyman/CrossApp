@@ -106,3 +106,36 @@ Core/
 ├── Domain/   – сутності з поведінкою та інваріантами (з тижня 4)
 └── Storage/  – реалізації сховищ (з тижня 5)
 ```
+
+## Команди запуску
+
+### Склад сувенірної продукції — імпорт з CSV (за замовчуванням)
+```bash
+dotnet run --project src/Cli
+```
+Без аргументів використовується файл `data/sample.csv`.
+
+### Явний шлях до CSV-файлу з коректними даними
+```bash
+dotnet run --project src/Cli data/sample_clean.csv
+```
+
+### CSV-файл із навмисно пошкодженими рядками
+```bash
+dotnet run --project src/Cli data/sample.csv
+```
+
+### Неіснуючий файл (перевірка обробки помилки)
+```bash
+dotnet run --project src/Cli data/no_such.csv
+```
+
+### Імпорт з JSON
+```bash
+dotnet run --project src/Cli data/sample.json
+```
+
+### Змішаний файл (товари + постачальники за префіксом)
+```bash
+dotnet run --project src/Cli data/mixed.csv
+```
