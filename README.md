@@ -139,3 +139,24 @@ dotnet run --project src/Cli data/sample.json
 ```bash
 dotnet run --project src/Cli data/mixed.csv
 ```
+
+## Інваріанти домену (lab04)
+
+**Product**
+- Id, SKU, назва, одиниця виміру, категорія не порожні — ArgumentException
+- Категорія з дозволеного списку — ArgumentException
+- Початковий залишок ≥ 0 — ArgumentOutOfRangeException
+- Кількість приходу та видачі > 0 — ArgumentOutOfRangeException
+- Не можна видати більше, ніж залишок — InvalidOperationException
+- Id і SKU незмінні, SKU нормалізується до верхнього регістру
+
+**IssueRequest**
+- Номер, товар, одержувач обов'язкові — ArgumentException / ArgumentNullException
+- Кількість у заявці > 0 — ArgumentOutOfRangeException
+- Переходи тільки Draft→Confirmed та Draft→Cancelled — InvalidOperationException
+- Підтвердження при нестачі товару — InvalidOperationException
+
+**IssuePolicy**
+- Не більше 5 відкритих заявок на одержувача — InvalidOperationException
+
+FromDto проходить ті самі перевірки, що й Create.

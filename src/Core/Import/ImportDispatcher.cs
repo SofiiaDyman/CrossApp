@@ -9,12 +9,13 @@ public static class ImportDispatcher
         if (Path.GetFileName(path).Equals("mixed.csv", StringComparison.OrdinalIgnoreCase))
             return FormatMixed(MixedCsvImporter.Load(path));
 
-        ImportResult<SouvenirDto> result = path.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
-            ? SouvenirJsonImporter.Load(path)
-            : SouvenirCsvImporter.Load(path);
+return FormatSouvenirs(LoadSouvenirs(path));
+}
 
-        return FormatSouvenirs(result);
-    }
+public static ImportResult<SouvenirDto> LoadSouvenirs(string path) =>
+    path.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
+        ? SouvenirJsonImporter.Load(path)
+        : SouvenirCsvImporter.Load(path);
 
     private static IReadOnlyList<string> FormatMixed(MixedImportResult mixed)
     {

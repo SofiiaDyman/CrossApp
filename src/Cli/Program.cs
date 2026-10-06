@@ -11,4 +11,7 @@ if (!File.Exists(path))
 foreach (string line in ImportDispatcher.Load(path))
     Console.WriteLine(line);
 
+DomainDemo.ImportToDomain(path);   
+DomainDemo.Run();                 
+
 return 0;
