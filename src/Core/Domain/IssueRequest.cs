@@ -39,9 +39,9 @@ public sealed class IssueRequest
 
     public void Confirm()
     {
-        EnsureTransition(IssueStatus.Confirmed);
-        Product.Issue(Quantity);
-        Status = IssueStatus.Confirmed;
+        EnsureTransition(IssueStatus.Confirmed); // 1. чи дозволений перехід
+        Product.Issue(Quantity);                 // 2. списання (може кинути виняток)
+        Status = IssueStatus.Confirmed;          // 3. статус лише в кінці
     }
 
     public void Cancel()

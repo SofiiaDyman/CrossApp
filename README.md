@@ -160,3 +160,15 @@ dotnet run --project src/Cli data/mixed.csv
 - Не більше 5 відкритих заявок на одержувача — InvalidOperationException
 
 FromDto проходить ті самі перевірки, що й Create.
+
+## Lab 05: сервісний шар і ручний DI
+
+- Інтерфейс: `ICatalogStore` (List, GetById, Add, Update, Remove)
+- Реалізації: `InMemoryCatalogStore`, `FileCatalogStore` (+ декоратор `CachingCatalogStore`)
+- Сервіс: `CatalogService` (Add, Receive, Issue, All, Find, Search)
+- Composition root: `src/Cli/Program.cs`
+
+dotnet run --project src/Cli                  # у пам'яті
+dotnet run --project src/Cli -- --file        # файл catalog.json
+dotnet run --project src/Cli -- --file --cache
+dotnet run --project src/Cli data/sample.csv  # старий імпорт з lab03/04

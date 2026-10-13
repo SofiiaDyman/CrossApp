@@ -27,7 +27,7 @@ public static class DomainDemo
         product.Issue(30);
         Console.WriteLine(product);
 
-        
+        //product.Quantity = 5;
 
         var request = IssueRequest.Create("R-001", product, "C-77", 20, new DateOnly(2025, 3, 1));
         request.Confirm();
@@ -41,7 +41,7 @@ public static class DomainDemo
         TryDo("видача більша за залишок", () => product.Issue(1000));
         TryDo("порожній SKU", () => Product.Create("P-002", " ", "Чашка", "посуд", "шт", 10));
         TryDo("від'ємний залишок", () => Product.Create("P-003", "SKU-003", "Чашка", "посуд", "шт", -5));
-        TryDo("невідома категорія", () => Product.Create("P-004", "SKU-004", "Меч", "зброя", "шт", 1));
+        TryDo("невідома категорія", () => Product.Create("P-004", "SKU-004", "Меч", "гра настільна", "шт", 1));
         TryDo("нульова кількість приходу", () => product.RegisterArrival(0));
         TryDo("повторне підтвердження заявки", () => request.Confirm());
         TryDo("скасування підтвердженої заявки", () => request.Cancel());
