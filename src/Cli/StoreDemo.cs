@@ -23,7 +23,7 @@ public static class StoreDemo
             Console.WriteLine($" {p.Id,-9} {p.Sku,-10} {p.Name,-28} {p.Quantity,5} {p.Unit}");
 
         // 5. пошук з предикатом (додаткове 2)
-        var low = service.Search(p => p.Quantity < 50);
+        var low = service.FindAll(p => p.Quantity < 50);
         Console.WriteLine($"Залишок < 50: {low.Count} поз.");
 
         // 6. відмови

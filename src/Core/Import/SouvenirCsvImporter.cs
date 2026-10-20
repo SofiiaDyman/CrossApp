@@ -13,7 +13,7 @@ public static class SouvenirCsvImporter
         "стікер", "шкарпетки", "гра", "блокнот"
     };
 
-    public static ImportResult<SouvenirDto> Load(string path)
+    public static ImportResult<SouvenirDto> Load(string path, Action<string>? onSkipped = null)
     {
         var items = new List<SouvenirDto>();
         var errors = new List<string>();
@@ -37,8 +37,12 @@ public static class SouvenirCsvImporter
                     items.Add(ok.Value);
                     break;
                 case ParseFailed failed:
-                    errors.Add($"рядок {number}: {failed.Reason}");
+                {
+                    string msg = $"рядок {number}: {failed.Reason}";
+                    errors.Add(msg);
+                    onSkipped?.Invoke(msg);   // одразу повідомляємо викликача
                     break;
+                }
             }
         }
 

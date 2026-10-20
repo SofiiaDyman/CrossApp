@@ -20,7 +20,9 @@ if (useCache)
 var service = new CatalogService(store);
 
 Console.WriteLine($"Сховище: {store.GetType().Name}");
-StoreDemo.Run(service);
+//StoreDemo.Run(service);
+EventDemo.Run(service);   // lab06
+SinkDemo.Run();           // додаткове 1
 
 // демонстрація кешу (додаткове 1)
 if (store is CachingCatalogStore cache)
@@ -41,8 +43,14 @@ if (importPath is not null)
         Console.WriteLine($"Файл не знайдено: {Path.GetFullPath(importPath)}");
         return 1;
     }
-    foreach (string line in ImportDispatcher.Load(importPath))
+    int skipped = 0;
+    foreach (string line in ImportDispatcher.Load(importPath, msg =>
+    {
+        skipped++;
+        Console.WriteLine($"  [Action] пропущено: {msg}");
+    }))
         Console.WriteLine(line);
+    Console.WriteLine($"Action<string> спрацював разів: {skipped}");
 
     DomainDemo.ImportToDomain(importPath);
     DomainDemo.Run();

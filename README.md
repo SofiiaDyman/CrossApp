@@ -172,3 +172,12 @@ dotnet run --project src/Cli                  # у пам'яті
 dotnet run --project src/Cli -- --file        # файл catalog.json
 dotnet run --project src/Cli -- --file --cache
 dotnet run --project src/Cli data/sample.csv  # старий імпорт з lab03/04
+
+## Lab 06: доменні події, Action/Func, лямбди
+
+- Події: `CatalogChangeKind` (Added, Received, Issued, Removed), `CatalogChangedEventArgs` (Id, Kind, Delta, QuantityAfter, At)
+- `CatalogService.Changed` (`EventHandler<CatalogChangedEventArgs>`), підняття лише після успішної зміни
+- Підписники в Cli: локальний метод (консоль + `logs/app.log`) і лямбда-лічильник
+- `FindAll(Func<Product,bool>)`; додатково: `INotificationSink` (ConsoleSink, FileSink), `Action<string>` в імпорті
+
+dotnet run --project src/Cli

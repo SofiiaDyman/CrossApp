@@ -4,18 +4,18 @@ namespace Core.Import;
 
 public static class ImportDispatcher
 {
-    public static IReadOnlyList<string> Load(string path)
-    {
-        if (Path.GetFileName(path).Equals("mixed.csv", StringComparison.OrdinalIgnoreCase))
-            return FormatMixed(MixedCsvImporter.Load(path));
+public static IReadOnlyList<string> Load(string path, Action<string>? onSkipped = null)
+{
+    if (Path.GetFileName(path).Equals("mixed.csv", StringComparison.OrdinalIgnoreCase))
+        return FormatMixed(MixedCsvImporter.Load(path));
 
-return FormatSouvenirs(LoadSouvenirs(path));
+    return FormatSouvenirs(LoadSouvenirs(path, onSkipped));
 }
 
-public static ImportResult<SouvenirDto> LoadSouvenirs(string path) =>
+public static ImportResult<SouvenirDto> LoadSouvenirs(string path, Action<string>? onSkipped = null) =>
     path.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
         ? SouvenirJsonImporter.Load(path)
-        : SouvenirCsvImporter.Load(path);
+        : SouvenirCsvImporter.Load(path, onSkipped);
 
     private static IReadOnlyList<string> FormatMixed(MixedImportResult mixed)
     {
