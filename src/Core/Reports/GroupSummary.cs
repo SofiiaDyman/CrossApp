@@ -1,3 +1,4 @@
 namespace Core.Reports;
 
-public sealed record GroupSummary(string Key, int Count, int TotalQuantity);
+//описує підсумок грпупи
+public sealed record GroupSummary(string Key, int Count , int TotalQuantity);
