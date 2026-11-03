@@ -181,3 +181,97 @@ dotnet run --project src/Cli data/sample.csv  # старий імпорт з lab
 - `FindAll(Func<Product,bool>)`; додатково: `INotificationSink` (ConsoleSink, FileSink), `Action<string>` в імпорті
 
 dotnet run --project src/Cli
+
+## Lab 07: LINQ-звіти
+
+Команди: `report-top`, `report-low`, `report-groups`, `report-sum`, `report-top-groups`,
+`report-groups-query`, `report-moves`, `report-moves-sum`, `report-lazy`, `report-bench`.
+
+### Коли виконується запит
+`source.Where(p => p.Quantity < 10)` лише описує запит і нічого не обчислює. Виконання
+відбувається під час кожного `query.Count()`, коли запит заново проходить `source`.
+Перший виклик побачив 3 дефіцитні позиції, потім у `source` додали «Скобу» з залишком 3,
+і другий `Count()` дав 4. `ToList()` виконав запит один раз і зберіг результат, тому
+`snapshot.Count` (властивість, а не метод) лишився 4 навіть після `source.Clear()`.
+
+### Синтаксис запитів vs методи
+(вставте порівняння: query syntax читається краще для group ... into, але не приймає
+StringComparer, тому в ByUnitQuerySyntax довелося писати ToLowerInvariant();
+Where/ThenBy/Take зручніші ланцюжком.)
+
+### Власне розширення TopBy
+Використано у TopByQuantity і TopUnits; другий ключ (tieBreaker) обов'язковий параметр.
+
+### Stopwatch, 100 000 записів
+(вставте свої числа і висновок: повторне перебирання lazy-запиту ≈ у 3 рази повільніше
+за ToList один раз; ToList усередині ланцюжка перед Take додає копіювання і примушує
+сортувати все, тоді як OrderBy(...).Take(n) може обійтися частковим сортуванням.)
+
+## Lab 07: запуск LINQ-звітів
+
+Усі команди виконуються з кореня репозиторію. Назву звіту передаємо першим аргументом без `--`, тому прапорці `--file` і `--cache` її не підміняють.
+
+### Основні звіти
+
+```bash
+dotnet run --project src/Cli -- report-top
+```
+Топ-5 позицій за залишком (`OrderByDescending` + `ThenBy` за SKU + `Take`). Другий ключ робить порядок однаковим між запусками.
+
+```bash
+dotnet run --project src/Cli -- report-low
+```
+Дефіцит: позиції із залишком менше 10, від меншого до більшого (`Where` + `OrderBy` + `Select` у DTO).
+
+```bash
+dotnet run --project src/Cli -- report-groups
+```
+Групування за одиницею виміру: кількість позицій і сумарний залишок у кожній групі (`GroupBy` + `Count` + `Sum`).
+
+```bash
+dotnet run --project src/Cli -- report-sum
+```
+Підсумки: кількість позицій, загальний залишок, середнє (`double`) і максимум.
+
+### Перевірки
+
+```bash
+dotnet run --project src/Cli -- report-empty
+```
+Усі звіти на порожньому джерелі: виводить `(порожньо)` і нулі, без винятків.
+
+```bash
+dotnet run --project src/Cli -- report-lazy
+```
+Демо відкладеного виконання: `Count()` до зміни джерела, `Count()` після зміни (число інше), потім `ToList()` фіксує знімок, який не змінюється після `Clear()`.
+
+### Додаткові завдання
+
+```bash
+dotnet run --project src/Cli -- report-top-groups
+```
+Топ-2 одиниці за сумарним залишком. Використовує власний метод-розширення `TopBy` (другий звіт, де він застосований).
+
+```bash
+dotnet run --project src/Cli -- report-groups-query
+```
+Те саме групування, але в синтаксисі запитів (`from ... group ... into`). Виводить також перевірку, що результат збігається з методним синтаксисом.
+
+```bash
+dotnet run --project src/Cli -- report-moves
+```
+`Join` товарів і переміщень: лише ті товари, які мають рухи. Рух по неіснуючому товару відкидається.
+
+```bash
+dotnet run --project src/Cli -- report-moves-sum
+```
+`GroupJoin`: усі товари, навіть без переміщень, з кількістю рухів і сальдо.
+
+```bash
+dotnet run -c Release --project src/Cli -- report-bench
+```
+Stopwatch на 100 000 згенерованих записів: порівняння запиту, що перебирається тричі, з одноразовим `ToList()`, а також топ-N з `ToList()` посередині ланцюжка і без нього. Запускати в `Release`, щоб час був показовим.
+
+### Скидання стану
+
+Звіти працюють із `SampleData` у пам'яті, тому числа однакові за кожного запуску. Для демо подій попередньої роботи тепер окрема команда `demo-events`.

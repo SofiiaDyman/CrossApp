@@ -59,7 +59,7 @@ public sealed class CatalogService(ICatalogStore store, IEnumerable<INotificatio
     public IReadOnlyList<Product> All() => _store.List();
     public Product? Find(string id) => _store.GetById(id);
 
-    // Func-пошук (замість Search з лаби 5)
+    // Func-пошук
     public IReadOnlyList<Product> FindAll(Func<Product, bool> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
