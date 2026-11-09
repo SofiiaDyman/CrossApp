@@ -155,6 +155,9 @@ coverage*.json
 coverage*.xml
 coverage*.info
 
+# Generated demo data
+/data/big.json
+
 # Visual Studio code coverage results
 *.coverage
 *.coveragexml

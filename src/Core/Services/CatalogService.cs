@@ -31,7 +31,7 @@ public sealed class CatalogService(ICatalogStore store, IEnumerable<INotificatio
     public void Receive(string id, int quantity)
     {
         var product = _store.GetById(id)
-            ?? throw new InvalidOperationException($"Немає запису з id={id}.");
+            ?? throw new DomainException($"Немає запису з id={id}.");
         product.RegisterArrival(quantity);       // виняток -> події не буде
         _store.Update(product);
         OnChanged(product, CatalogChangeKind.Received, quantity);
@@ -40,7 +40,7 @@ public sealed class CatalogService(ICatalogStore store, IEnumerable<INotificatio
     public void Issue(string id, int quantity)
     {
         var product = _store.GetById(id)
-            ?? throw new InvalidOperationException($"Немає запису з id={id}.");
+            ?? throw new DomainException($"Немає запису з id={id}.");
         product.Issue(quantity);
         _store.Update(product);
         OnChanged(product, CatalogChangeKind.Issued, -quantity);    // видача = мінус
@@ -58,6 +58,64 @@ public sealed class CatalogService(ICatalogStore store, IEnumerable<INotificatio
 
     public IReadOnlyList<Product> All() => _store.List();
     public Product? Find(string id) => _store.GetById(id);
+
+    public async Task<int> ImportAsync(ICatalogImporter importer, string path,
+        CancellationToken ct = default, IProgress<int>? progress = null)
+    {
+        ArgumentNullException.ThrowIfNull(importer);
+        ct.ThrowIfCancellationRequested();
+
+        var items = await importer.LoadAsync(path, ct);
+        var added = 0;
+        var lastPercent = -1;
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+            var item = items[i];
+
+            if (_store.GetById(item.Id) is null)
+            {
+                _store.Add(item);
+                OnChanged(item, CatalogChangeKind.Added, item.Quantity);
+                added++;
+            }
+
+            var percent = (i + 1) * 100 / items.Count;
+            if (percent != lastPercent)
+            {
+                lastPercent = percent;
+                progress?.Report(percent);
+            }
+        }
+
+        return added;
+    }
+
+    public async Task<int> ImportStreamAsync(ICatalogImporter importer, string path,
+        CancellationToken ct = default, IProgress<int>? progress = null)
+    {
+        ArgumentNullException.ThrowIfNull(importer);
+        var added = 0;
+        var seen = 0;
+
+        await foreach (var item in importer.StreamAsync(path, ct).WithCancellation(ct))
+        {
+            ct.ThrowIfCancellationRequested();
+            seen++;
+            if (_store.GetById(item.Id) is null)
+            {
+                _store.Add(item);
+                OnChanged(item, CatalogChangeKind.Added, item.Quantity);
+                added++;
+            }
+
+            if (seen % 1000 == 0)
+                progress?.Report(seen);
+        }
+
+        return added;
+    }
 
     // Func-пошук
     public IReadOnlyList<Product> FindAll(Func<Product, bool> predicate)

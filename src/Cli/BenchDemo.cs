@@ -23,6 +23,6 @@ public static class BenchDemo
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < runs; i++) sink += action();
         sw.Stop();
-        Console.WriteLine($" {title,-42} {sw.Elapsed.TotalMilliseconds / runs,8:F2} мс/запуск  (контрольна сума {sink})");
+        Console.WriteLine($" {title,-42} {sw.Elapsed.TotalMilliseconds / runs,8:F4} мс/запуск  (контрольна сума {sink})");
     }
 }

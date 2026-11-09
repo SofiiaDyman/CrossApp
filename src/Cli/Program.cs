@@ -62,6 +62,10 @@ switch (command)
     case "report-bench":
         BenchDemo.Run();
         break;
+    case "import":
+        return await ImportCommand.RunAsync(service, args);
+    case "import-gen":
+        return await ImportCommand.GenerateAsync(args);
     case "demo-events":
         Console.WriteLine($"Сховище: {store.GetType().Name}");
         EventDemo.Run(service);
@@ -71,7 +75,7 @@ switch (command)
         if (Path.HasExtension(command))
             return ImportDemo.Run(command);
         Console.WriteLine("report-top | report-low | report-groups | report-top-groups | report-groups-query |");
-        Console.WriteLine("report-sum | report-moves | report-moves-sum | report-empty | report-lazy | report-bench | demo-events");
+        Console.WriteLine("report-sum | report-moves | report-moves-sum | report-empty | report-lazy | report-bench | import | import-gen | demo-events");
         return 1;
 }
 

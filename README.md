@@ -250,3 +250,35 @@ Stopwatch на 100 000 згенерованих записів: порівнян
 ### Скидання стану
 
 Звіти працюють із `SampleData` у пам'яті, тому числа однакові за кожного запуску. Для демо подій попередньої роботи тепер окрема команда `demo-events`.
+
+## Lab 08
+
+### Тести
+
+```bash
+dotnet test
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+### Перевірка імпорту та скасування
+
+```bash
+dotnet run --project src/Cli -- import
+dotnet run --project src/Cli -- import --file    # перший раз 17, другий раз 0 (ідемпотентність)
+dotnet run --project src/Cli -- import-gen --count=17 --path=data/import.json
+dotnet run --project src/Cli -- import --path=data/big.json --timeout=30
+```
+
+- `Ctrl+C` під час `import --path=data/big.json` завершує запуск з повідомленням `Імпорт скасовано.`.
+- `--stream` імпортує записи у потоці: `dotnet run --project src/Cli -- import --path=data/big.json --stream`.
+- Для пошкодженого JSON: `dotnet run --project src/Cli -- import --path=data/sample.json` показує `Дані відхилено: Запис 9: SKU не може бути порожнім`.
+
+### Інваріанти і винятки
+
+- `Product.Issue`, `IssueRequest.EnsureTransition` і `IssuePolicy.EnsureRecipientCanOpen` тепер кидають `DomainException` замість `InvalidOperationException`.
+- `CatalogService.Receive` і `CatalogService.Issue` також кидають `DomainException` для відсутнього запису.
+- `StorageException` використовується для помилок читання/парсингу JSON, зберігаючи `InnerException`.
+
+### Структура solution
+
+`CrossApp.slnx` містить обидві проєктні групи, включно з `tests/Core.Tests`.

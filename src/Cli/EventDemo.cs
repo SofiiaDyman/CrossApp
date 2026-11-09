@@ -1,3 +1,4 @@
+using Core;
 using Core.Events;
 using Core.Services;
 
@@ -54,7 +55,7 @@ public static class EventDemo
     private static void TryFail(string title, Action action)
     {
         try { action(); Console.WriteLine($"  {title}: помилки не було!"); }
-        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or DomainException)
         { Console.WriteLine($"  Помилка ({title}): {ex.Message}"); }
     }
 }

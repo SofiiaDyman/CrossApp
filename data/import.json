@@ -1,0 +1,138 @@
+[
+  {
+    "Id": "G-000001",
+    "Sku": "GEN-000001",
+    "Name": "Товар 1",
+    "Category": "іграшка",
+    "Unit": "шт",
+    "Quantity": 8
+  },
+  {
+    "Id": "G-000002",
+    "Sku": "GEN-000002",
+    "Name": "Товар 2",
+    "Category": "магніт",
+    "Unit": "уп",
+    "Quantity": 15
+  },
+  {
+    "Id": "G-000003",
+    "Sku": "GEN-000003",
+    "Name": "Товар 3",
+    "Category": "дерево",
+    "Unit": "пара",
+    "Quantity": 22
+  },
+  {
+    "Id": "G-000004",
+    "Sku": "GEN-000004",
+    "Name": "Товар 4",
+    "Category": "посуд",
+    "Unit": "комп",
+    "Quantity": 29
+  },
+  {
+    "Id": "G-000005",
+    "Sku": "GEN-000005",
+    "Name": "Товар 5",
+    "Category": "стікер",
+    "Unit": "шт",
+    "Quantity": 36
+  },
+  {
+    "Id": "G-000006",
+    "Sku": "GEN-000006",
+    "Name": "Товар 6",
+    "Category": "шкарпетки",
+    "Unit": "уп",
+    "Quantity": 43
+  },
+  {
+    "Id": "G-000007",
+    "Sku": "GEN-000007",
+    "Name": "Товар 7",
+    "Category": "гра",
+    "Unit": "пара",
+    "Quantity": 50
+  },
+  {
+    "Id": "G-000008",
+    "Sku": "GEN-000008",
+    "Name": "Товар 8",
+    "Category": "блокнот",
+    "Unit": "комп",
+    "Quantity": 57
+  },
+  {
+    "Id": "G-000009",
+    "Sku": "GEN-000009",
+    "Name": "Товар 9",
+    "Category": "іграшка",
+    "Unit": "шт",
+    "Quantity": 64
+  },
+  {
+    "Id": "G-000010",
+    "Sku": "GEN-000010",
+    "Name": "Товар 10",
+    "Category": "магніт",
+    "Unit": "уп",
+    "Quantity": 71
+  },
+  {
+    "Id": "G-000011",
+    "Sku": "GEN-000011",
+    "Name": "Товар 11",
+    "Category": "дерево",
+    "Unit": "пара",
+    "Quantity": 78
+  },
+  {
+    "Id": "G-000012",
+    "Sku": "GEN-000012",
+    "Name": "Товар 12",
+    "Category": "посуд",
+    "Unit": "комп",
+    "Quantity": 85
+  },
+  {
+    "Id": "G-000013",
+    "Sku": "GEN-000013",
+    "Name": "Товар 13",
+    "Category": "стікер",
+    "Unit": "шт",
+    "Quantity": 92
+  },
+  {
+    "Id": "G-000014",
+    "Sku": "GEN-000014",
+    "Name": "Товар 14",
+    "Category": "шкарпетки",
+    "Unit": "уп",
+    "Quantity": 2
+  },
+  {
+    "Id": "G-000015",
+    "Sku": "GEN-000015",
+    "Name": "Товар 15",
+    "Category": "гра",
+    "Unit": "пара",
+    "Quantity": 9
+  },
+  {
+    "Id": "G-000016",
+    "Sku": "GEN-000016",
+    "Name": "Товар 16",
+    "Category": "блокнот",
+    "Unit": "комп",
+    "Quantity": 16
+  },
+  {
+    "Id": "G-000017",
+    "Sku": "GEN-000017",
+    "Name": "Товар 17",
+    "Category": "іграшка",
+    "Unit": "шт",
+    "Quantity": 23
+  }
+]

@@ -1,3 +1,4 @@
+using Core;
 using Core.Dto;
 
 namespace Core.Domain;
@@ -60,7 +61,7 @@ public sealed class IssueRequest
         };
 
         if (!allowed)
-            throw new InvalidOperationException(
+            throw new DomainException(
                 $"Заявка {Id}: перехід {Status} → {target} неможливий");
     }
 

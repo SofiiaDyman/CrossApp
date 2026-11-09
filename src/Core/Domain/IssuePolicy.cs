@@ -1,3 +1,5 @@
+using Core;
+
 namespace Core.Domain;
 
 public static class IssuePolicy
@@ -13,7 +15,7 @@ public static class IssuePolicy
         int open = existing.Count(r => r.RecipientId == recipientId.Trim()
                                     && r.Status == IssueStatus.Draft);
         if (open >= MaxOpenPerRecipient)
-            throw new InvalidOperationException(
+            throw new DomainException(
                 $"Одержувач {recipientId} уже має {open} відкритих заявок (максимум {MaxOpenPerRecipient})");
     }
 }

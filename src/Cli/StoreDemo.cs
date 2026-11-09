@@ -1,3 +1,4 @@
+using Core;
 using Core.Services;
 
 public static class StoreDemo
@@ -39,7 +40,7 @@ public static class StoreDemo
             action();
             Console.WriteLine($"  {title}: помилки не було!");
         }
-        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or DomainException)
         {
             Console.WriteLine($"  Помилка ({title}): {ex.Message}");
         }
