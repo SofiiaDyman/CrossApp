@@ -157,6 +157,9 @@ coverage*.info
 
 # Generated demo data
 /data/big.json
+/data/items.json
+/data/catalog.json
+secrets.json
 
 # Visual Studio code coverage results
 *.coverage

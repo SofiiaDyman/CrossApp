@@ -282,3 +282,65 @@ dotnet run --project src/Cli -- import --path=data/big.json --timeout=30
 ### Структура solution
 
 `CrossApp.slnx` містить обидві проєктні групи, включно з `tests/Core.Tests`.
+
+## Lab 09: шляхи, конфігурація, secrets
+
+Джерела конфігурації (пізніше перекриває раніше):
+`appsettings.json` → `appsettings.{CROSSAPP_ENVIRONMENT}.json` → user-secrets → змінні `CROSSAPP_*` → аргументи `--Key=value`.
+
+Профіль за замовчуванням — Development. Відносні шляхи рахуються від `AppContext.BaseDirectory` (каталог збірки), а не від поточного каталогу, тому запуск з кореня solution і з `src/Cli` дає один і той самий файл даних.
+
+### Профілі
+
+| Профіль | Як увімкнути | Logging:MinimumLevel | Дані |
+|---|---|---|---|
+| Development | за замовчуванням | Debug | `<BaseDirectory>/data/items.json` |
+| Production | `$env:CROSSAPP_ENVIRONMENT = "Production"` | Information | `<BaseDirectory>/data/items.json` |
+
+### Таблиця ключів
+
+| Ключ | Змінна середовища | За замовчуванням |
+|---|---|---|
+| Storage:DataPath | CROSSAPP_Storage__DataPath | data |
+| Storage:FileName | CROSSAPP_Storage__FileName | items.json |
+| Logging:MinimumLevel | CROSSAPP_Logging__MinimumLevel | Information (Debug у Development) |
+| EnvironmentName | CROSSAPP_EnvironmentName | Production (у Development — Development) |
+| Warehouse:DefaultUnit | CROSSAPP_Warehouse__DefaultUnit | шт |
+| Integration:ApiKey | CROSSAPP_Integration__ApiKey | немає (secret) |
+| — (простий шлях) | CROSSAPP_DATA_PATH | перекриває шлях з усіх джерел |
+| — (профіль) | CROSSAPP_ENVIRONMENT | Development |
+
+У назвах змінних двокрапка з ключа замінюється на `__`.
+
+### PowerShell
+
+```powershell
+$env:CROSSAPP_DATA_PATH = "$env:TEMP\crossapp-data"
+$env:CROSSAPP_Integration__ApiKey = "from-env"
+$env:CROSSAPP_ENVIRONMENT = "Production"
+dotnet run --project src/Cli -- export
+
+# повернути стан (змінні живуть до кінця сесії)
+Remove-Item Env:CROSSAPP_DATA_PATH, Env:CROSSAPP_Integration__ApiKey, Env:CROSSAPP_ENVIRONMENT
+```
+
+### bash (Linux/macOS)
+
+```bash
+CROSSAPP_DATA_PATH=/tmp/data dotnet run --project src/Cli -- export
+CROSSAPP_Integration__ApiKey=from-env dotnet run --project src/Cli -- config
+dotnet run --project src/Cli -- config --Logging:MinimumLevel=Warning
+```
+
+### Secrets
+
+```powershell
+dotnet user-secrets set "Integration:ApiKey" "..." --project src/Cli
+dotnet user-secrets list --project src/Cli
+```
+
+`secrets.json` лежить поза репозиторієм: у Windows `%APPDATA%\Microsoft\UserSecrets\<UserSecretsId>\`, у Linux/macOS `~/.microsoft/usersecrets/<UserSecretsId>/`. У git комітиться лише `UserSecretsId` у `Cli.csproj`. Консоль друкує тільки факт наявності ключа і його довжину.
+
+### Команди
+
+`config`, `export`, `import [--file] [--path=...]`, `add --sku= --name= --category= [--unit=] --qty=`.

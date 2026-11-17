@@ -8,8 +8,6 @@ namespace Core.Storage;
 
 public sealed class JsonCatalogImporter : ICatalogImporter
 {
-    private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
-
     public async Task<IReadOnlyList<Product>> LoadAsync(string path, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
@@ -18,7 +16,7 @@ public sealed class JsonCatalogImporter : ICatalogImporter
         try
         {
             await using var stream = Open(path);
-            dtos = await JsonSerializer.DeserializeAsync<List<SouvenirDto>>(stream, Options, ct)
+            dtos = await JsonSerializer.DeserializeAsync<List<SouvenirDto>>(stream, CatalogJson.Options, ct)
                 ?? throw new DomainException($"Файл {Path.GetFileName(path)} не містить списку.");
         }
         catch (JsonException ex)
@@ -43,7 +41,7 @@ public sealed class JsonCatalogImporter : ICatalogImporter
         await using var stream = Open(path);
         var number = 0;
 
-        await foreach (var dto in JsonSerializer.DeserializeAsyncEnumerable<SouvenirDto>(stream, Options, ct))
+        await foreach (var dto in JsonSerializer.DeserializeAsyncEnumerable<SouvenirDto>(stream, CatalogJson.Options, ct))
         {
             ct.ThrowIfCancellationRequested();
             yield return ToProduct(dto, ++number);

@@ -4,12 +4,10 @@ using Core.Storage;
 
 public static class StoreFactory
 {
-    public static ICatalogStore Create(string[] args)
+    public static ICatalogStore Create(string[] args, string dataFile)
     {
-        string dataPath = Path.Combine(AppContext.BaseDirectory, "data", "catalog.json");
-
         ICatalogStore store = args.Contains("--file")
-            ? new FileCatalogStore(dataPath)
+            ? new FileCatalogStore(dataFile)
             : new InMemoryCatalogStore(SampleData.Products());
 
         return args.Contains("--cache") ? new CachingCatalogStore(store) : store;

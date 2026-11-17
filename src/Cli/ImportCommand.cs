@@ -55,7 +55,7 @@ public static class ImportCommand
     public static async Task<int> GenerateAsync(string[] args)
     {
         int count = int.TryParse(Arg(args, "--count="), out var c) ? c : 300_000;
-        string path = Path.GetFullPath(Arg(args, "--path=") ?? "data/big.json");
+        string path = Path.GetFullPath(Arg(args, "--path=") ?? Path.Combine(AppContext.BaseDirectory, "data", "big.json"));
 
         var dtos = SampleData.Generate(count)
             .Select(p => p.ToDto() with { Quantity = Math.Max(1, p.Quantity) })
@@ -63,7 +63,7 @@ public static class ImportCommand
 
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
-        await JsonSerializer.SerializeAsync(fs, dtos, new JsonSerializerOptions { WriteIndented = true });
+        await JsonSerializer.SerializeAsync(fs, dtos, CatalogJson.Options);
         Console.WriteLine($"Згенеровано {count} записів: {path}");
         return 0;
     }
