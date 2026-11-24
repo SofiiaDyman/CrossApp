@@ -1,0 +1,56 @@
+@host = http://localhost:5080
+
+### health
+GET {{host}}/health
+
+### list
+GET {{host}}/api/products?page=1&pageSize=5&search=магніт
+
+### low-stock
+GET {{host}}/api/products/low-stock?threshold=30
+
+### CREATE
+# @name create
+POST {{host}}/api/products
+Content-Type: application/json
+
+{ "sku": "A-100", "name": "Магніт Високий Замок", "category": "магніт", "unit": "шт", "quantity": 40 }
+
+@id = {{create.response.body.$.id}}
+GET {{host}}/api/products/{{id}}
+
+### UPDATE
+PUT {{host}}/api/products/{{id}}
+Content-Type: application/json
+
+{ "sku": "A-100", "name": "Магніт Високий Замок XL", "category": "магніт", "unit": "шт", "quantity": 55 }
+
+### invalid update
+PUT {{host}}/api/products/{{id}}
+Content-Type: application/json
+
+{ "sku": "A-100", "name": "", "category": "магніт", "unit": "шт", "quantity": 55 }
+
+### multiple errors
+POST {{host}}/api/products
+Content-Type: application/json
+
+{ "sku": "", "name": "X", "category": "?", "unit": "", "quantity": -1 }
+
+### broken quantity
+POST {{host}}/api/products
+Content-Type: application/json
+
+{ "sku": "A-1", "name": "X", "category": "магніт", "unit": "шт", "quantity": "abc" }
+
+### duplicate sku
+POST {{host}}/api/products
+Content-Type: application/json
+
+{ "sku": "SKU-001", "name": "Дубль", "category": "магніт", "unit": "шт", "quantity": 1 }
+
+### DELETE
+DELETE {{host}}/api/products/{{id}}
+
+### GET after DELETE
+GET {{host}}/api/products/{{id}}

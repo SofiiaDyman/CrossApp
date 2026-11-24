@@ -5,7 +5,7 @@ namespace Core.Domain;
 
 public sealed class Product
 {
-    private static readonly string[] AllowedCategories =
+    public static IReadOnlyList<string> AllowedCategories { get; } =
     [
         "іграшка", "магніт", "дерево", "посуд",
         "стікер", "шкарпетки", "гра", "блокнот"

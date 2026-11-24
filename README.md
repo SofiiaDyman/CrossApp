@@ -341,6 +341,91 @@ dotnet user-secrets list --project src/Cli
 
 `secrets.json` лежить поза репозиторієм: у Windows `%APPDATA%\Microsoft\UserSecrets\<UserSecretsId>\`, у Linux/macOS `~/.microsoft/usersecrets/<UserSecretsId>/`. У git комітиться лише `UserSecretsId` у `Cli.csproj`. Консоль друкує тільки факт наявності ключа і його довжину.
 
+## Lab 10: Minimal API (Склад)
+
+`src/Api` — друга точка входу поряд із `src/Cli`. Обидва проєкти використовують один `Core`, який не залежить від HTTP. Cli і `Core.Tests` залишаються робочими.
+
+**Порт:** `http://localhost:5080`
+
+### Запуск
+
+```bash
+dotnet run --project src/Api --urls http://localhost:5080
+```
+
+Лише в Development:
+- Scalar UI: http://localhost:5080/scalar/v1
+- OpenAPI: http://localhost:5080/openapi/v1.json
+
+### Маршрути
+
+| Метод | Шлях | Тіло | Коди |
+|---|---|---|---|
+| GET | `/api/products?page=1&pageSize=20&search=...` | — | 200 `{items,total}`, 400 |
+| GET | `/api/products/low-stock?threshold=5` | — | 200, 400 |
+| GET | `/api/products/{id}` | — | 200, 404 |
+| POST | `/api/products` | `SaveProductRequest` | 201 (Location), 400, 409 |
+| PUT | `/api/products/{id}` | `SaveProductRequest` | 200, 400, 404, 409 |
+| DELETE | `/api/products/{id}` | — | 204, 404 |
+| GET | `/health` | — | 200 |
+
+`SaveProductRequest`: `sku`, `name`, `category`, `unit`, `quantity`, `note` (необов'язкове).
+`ProductDto`: `id`, `sku`, `name`, `category`, `unit`, `quantity`, `note`.
+
+Помилки повертаються у форматі ProblemDetails (RFC 9457): 400 містить словник `errors` по полях, 409 (порушення бізнес-правила, наприклад дубль SKU) містить `detail`. Stack trace клієнту не показується.
+
+### Приклади curl
+
+Кирилицю передаємо через heredoc із `--data-binary`: `curl` у Git Bash під Windows надсилає аргумент `-d` не в UTF-8, і сервер відповідає 400.
+
+```bash
+# створити -> 201 + Location
+curl -i -X POST http://localhost:5080/api/products -H "Content-Type: application/json" \
+  --data-binary @- <<'EOF'
+{"sku":"A-101","name":"Магніт Високий Замок","category":"магніт","unit":"шт","quantity":40}
+EOF
+
+# прочитати (id з відповіді) -> 200
+curl -i http://localhost:5080/api/products/<id>
+
+# замінити -> 200
+curl -i -X PUT http://localhost:5080/api/products/<id> -H "Content-Type: application/json" \
+  --data-binary @- <<'EOF'
+{"sku":"A-101","name":"Магніт XL","category":"магніт","unit":"шт","quantity":55}
+EOF
+
+# помилка валідації -> 400
+curl -i -X POST http://localhost:5080/api/products -H "Content-Type: application/json" \
+  --data-binary @- <<'EOF'
+{"sku":"","name":"X","category":"?","unit":"","quantity":-1}
+EOF
+
+# видалити -> 204, потім GET -> 404
+curl -i -X DELETE http://localhost:5080/api/products/<id>
+curl -i http://localhost:5080/api/products/<id>
+
+# пагінація, пошук латиницею і low-stock
+curl -i "http://localhost:5080/api/products?page=1&pageSize=5&search=SKU-00"
+curl -i "http://localhost:5080/api/products/low-stock?threshold=30"
+```
+
+Повторний POST з артикулом, який уже існує, дає 409.
+
+### Реалізація
+
+- DTO окремо від доменної сутності: `Contracts/ProductDto.cs`, `Contracts/SaveProductRequest.cs`.
+- Валідація: FluentValidation + `ValidationFilter<T>` через `AddEndpointFilter` (400 з `ValidationProblem`).
+- `GlobalExceptionHandler` (`AddExceptionHandler` + `UseExceptionHandler`): `DomainException` → 409, некоректне тіло → 400, решта → 500 без деталей.
+- Сховище реєструється як Singleton (`ICatalogStore`) і береться параметром делегата. `InMemoryCatalogStore` зроблено потокобезпечним (`ConcurrentDictionary`).
+- Файл `src/Api/Api.http` містить цикл create → read → update → delete → GET (404).
+
+### Тести
+
+```bash
+dotnet test
+```
+Запускає `Core.Tests` і `Api.Tests` (`WebApplicationFactory<Program>`: POST 201 + GET за Location, 400, 409, DELETE → 404, зламаний JSON → 400).
+
 ### Команди
 
 `config`, `export`, `import [--file] [--path=...]`, `add --sku= --name= --category= [--unit=] --qty=`.
